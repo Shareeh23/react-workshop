@@ -3,12 +3,15 @@ import { ShoppingCart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useCart } from "@/hooks/use-cart";
 
 type ProductCardProps = {
   product: Product;
 };
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const { dispatch } = useCart();
+
   return (
     <Card className="flex h-full flex-col overflow-hidden border-border/60 bg-card py-0">
       {/* Product image */}
@@ -52,7 +55,17 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       {/* Add to cart */}
       <CardFooter className="mt-auto px-4 pb-4">
-        <Button className="w-full gap-2">
+        <Button
+          className="w-full gap-2"
+          onClick={() =>
+            dispatch({
+              type: "ADD_PRODUCT",
+              payload: {
+                product,
+              },
+            })
+          }
+        >
           <ShoppingCart className="size-4" />
           Add to Cart
         </Button>

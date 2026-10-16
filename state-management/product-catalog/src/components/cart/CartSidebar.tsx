@@ -1,4 +1,10 @@
-import type { CartAction, CartState, CartProductAction } from "@/types/cart";
+import { useCart } from "@/hooks/use-cart";
+
+import {
+  getUniqueProductCount,
+  getTotalItemCount,
+  calculateCartTotal,
+} from "@/utils/cart";
 
 import { Minus, Plus, ShoppingBag, ShoppingCart, Trash2 } from "lucide-react";
 
@@ -12,88 +18,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useReducer } from "react";
-
-const sampleCartItems = [
-  {
-    id: 1,
-    title: "Essence Mascara Lash Princess",
-    price: 9.99,
-    quantity: 2,
-    thumbnail: "https://dummyjson.com/image/100x100",
-  },
-  {
-    id: 2,
-    title: "Eyeshadow Palette",
-    price: 19.99,
-    quantity: 1,
-    thumbnail: "https://dummyjson.com/image/100x100",
-  },
-];
-
-function findCartItem(state: CartState, action: CartProductAction) {
-  return state.find((item) => item.product.id === action.payload.product.id);
-}
-
-function incrementCartItemQuantity(
-  state: CartState,
-  action: CartProductAction,
-) {
-  return state.map((cartItem) =>
-    cartItem.product.id === action.payload.product.id
-      ? { ...cartItem, quantity: cartItem.quantity + 1 }
-      : cartItem,
-  );
-}
-
-function removeCartItem(state: CartState, action: CartProductAction) {
-  return state.filter(
-    (cartItem) => cartItem.product.id !== action.payload.product.id,
-  );
-}
-
-function reducer(state: CartState, action: CartAction) {
-  switch (action.type) {
-    case "ADD_PRODUCT": {
-      const itemExists = findCartItem(state, action);
-
-      if (itemExists) {
-        return incrementCartItemQuantity(state, action);
-      }
-
-      return [...state, { product: action.payload.product, quantity: 1 }];
-    }
-
-    case "INCREASE_QUANTITY": {
-      const itemExists = findCartItem(state, action);
-
-      if (itemExists) {
-        return incrementCartItemQuantity(state, action);
-      }
-
-      return state;
-    }
-
-    case "REMOVE_PRODUCT": {
-      const itemExists = findCartItem(state, action);
-
-      if (itemExists) {
-        return removeCartItem(state, action);
-      }
-
-      return state;
-    }
-
-    case "CLEAR_CART":
-      return [];
-
-    default:
-      return state;
-  }
-}
 
 export default function CartSidebar() {
-  const [state, dispatch] = useReducer(reducer, []);
+  const { state, dispatch } = useCart();
 
   return (
     <aside className="w-full lg:w-80 xl:w-96 lg:shrink-0">
@@ -114,7 +41,12 @@ export default function CartSidebar() {
             </div>
           </div>
 
-          <Button variant="ghost" size="sm" className="text-destructive">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-destructive"
+            onClick={() => dispatch({ type: "CLEAR_CART" })}
+          >
             Clear Cart
           </Button>
         </CardHeader>
@@ -124,13 +56,13 @@ export default function CartSidebar() {
         <CardContent className="space-y-5 px-5 py-5">
           {/* Cart items */}
           <div className="space-y-5">
-            {sampleCartItems.map((item) => (
-              <div key={item.id} className="flex gap-3">
+            {state.map((item) => (
+              <div key={item.product.id} className="flex gap-3">
                 {/* Thumbnail */}
                 <div className="size-16 shrink-0 overflow-hidden rounded-lg bg-muted">
                   <img
-                    src={item.thumbnail}
-                    alt={item.title}
+                    src={item.product.thumbnail}
+                    alt={item.product.title}
                     className="h-full w-full object-cover"
                   />
                 </div>
@@ -139,21 +71,27 @@ export default function CartSidebar() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="line-clamp-2 text-sm font-medium">
-                      {item.title}
+                      {item.product.title}
                     </h3>
 
                     <Button
                       variant="ghost"
                       size="icon"
                       className="size-7 shrink-0 text-muted-foreground hover:text-destructive"
-                      aria-label={`Remove ${item.title}`}
+                      aria-label={`Remove ${item.product.title}`}
+                      onClick={() =>
+                        dispatch({
+                          type: "REMOVE_PRODUCT",
+                          payload: { product: item.product },
+                        })
+                      }
                     >
                       <Trash2 className="size-4" />
                     </Button>
                   </div>
 
                   <p className="mt-1 text-sm font-semibold">
-                    ${item.price.toFixed(2)}
+                    ${item.product.price.toFixed(2)}
                   </p>
 
                   {/* Quantity controls */}
@@ -163,6 +101,12 @@ export default function CartSidebar() {
                       size="icon"
                       className="size-7"
                       aria-label="Decrease quantity"
+                      onClick={() =>
+                        dispatch({
+                          type: "DECREASE_QUANTITY",
+                          payload: { product: item.product },
+                        })
+                      }
                     >
                       <Minus className="size-3" />
                     </Button>
@@ -176,6 +120,12 @@ export default function CartSidebar() {
                       size="icon"
                       className="size-7"
                       aria-label="Increase quantity"
+                      onClick={() =>
+                        dispatch({
+                          type: "INCREASE_QUANTITY",
+                          payload: { product: item.product },
+                        })
+                      }
                     >
                       <Plus className="size-3" />
                     </Button>
@@ -192,19 +142,19 @@ export default function CartSidebar() {
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Unique products</span>
 
-              <Badge variant="secondary">2</Badge>
+              <Badge variant="secondary">{getUniqueProductCount(state)}</Badge>
             </div>
 
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Total items</span>
 
-              <span>3</span>
+              <span>{getTotalItemCount(state)}</span>
             </div>
 
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Subtotal</span>
 
-              <span>$39.97</span>
+              <span>${calculateCartTotal(state)}</span>
             </div>
 
             <Separator />
@@ -212,7 +162,9 @@ export default function CartSidebar() {
             <div className="flex items-center justify-between">
               <span className="font-semibold">Total</span>
 
-              <span className="text-2xl font-bold">$39.97</span>
+              <span className="text-2xl font-bold">
+                ${calculateCartTotal(state)}
+              </span>
             </div>
           </div>
         </CardContent>
