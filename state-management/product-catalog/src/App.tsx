@@ -1,34 +1,18 @@
 import { useState, useEffect } from "react";
 
+import type { ProductCollection, FetchResponse } from "./types/products";
+
+import ProductGrid from "./components/products/ProductGrid";
+import CartSidebar from "./components/cart/CartSidebar";
+
 const URL =
   "https://dummyjson.com/products?limit=9&select=id,title,description,brand,category,price,discountPercentage,tags,thumbnail";
-
-type Product = {
-  id: number;
-  title: string;
-  description: string;
-  brand: string;
-  category: string;
-  price: number;
-  discountPercentage: number;
-  tags: string[];
-  thumbnail: string;
-};
-
-type ProductCollection = Product[];
-
-type ProductsResponse = {
-  products: ProductCollection;
-  total: number;
-  skip?: number;
-  limit?: number;
-};
 
 export function App() {
   const [products, setProducts] = useState<ProductCollection>([]);
 
   useEffect(() => {
-    const controller= new AbortController();
+    const controller = new AbortController();
 
     async function fetchProducts() {
       try {
@@ -40,7 +24,7 @@ export function App() {
           throw new Error("Unable to fetch products");
         }
 
-        const data: ProductsResponse = await response.json();
+        const data: FetchResponse = await response.json();
 
         setProducts(data.products);
         return products;
@@ -56,11 +40,19 @@ export function App() {
   }, [products]);
 
   return (
-    <div>
-      {products.map((product) => (
-        <div key={product.id}>{product.title}</div>
-      ))}
-    </div>
+    <main className="min-h-screen bg-background px-4 py-8 text-foreground sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-screen-2xl">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+          {/* Products */}
+          <div className="min-w-0 flex-1">
+            <ProductGrid products={products} />
+          </div>
+
+          {/* Shopping cart */}
+          <CartSidebar />
+        </div>
+      </div>
+    </main>
   );
 }
 
