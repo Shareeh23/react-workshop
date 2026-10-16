@@ -41,5 +41,5 @@ export function getTotalItemCount(cart: CartState) {
 }
 
 export function calculateCartTotal(cart: CartState) {
-  return cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0)
+  return cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0).toFixed(2)
 }
