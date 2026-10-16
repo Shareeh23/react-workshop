@@ -1,3 +1,5 @@
+import type { CartAction, CartState, CartProductAction } from "@/types/cart";
+
 import { Minus, Plus, ShoppingBag, ShoppingCart, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useReducer } from "react";
 
 const sampleCartItems = [
   {
@@ -28,7 +31,70 @@ const sampleCartItems = [
   },
 ];
 
+function findCartItem(state: CartState, action: CartProductAction) {
+  return state.find((item) => item.product.id === action.payload.product.id);
+}
+
+function incrementCartItemQuantity(
+  state: CartState,
+  action: CartProductAction,
+) {
+  return state.map((cartItem) =>
+    cartItem.product.id === action.payload.product.id
+      ? { ...cartItem, quantity: cartItem.quantity + 1 }
+      : cartItem,
+  );
+}
+
+function removeCartItem(state: CartState, action: CartProductAction) {
+  return state.filter(
+    (cartItem) => cartItem.product.id !== action.payload.product.id,
+  );
+}
+
+function reducer(state: CartState, action: CartAction) {
+  switch (action.type) {
+    case "ADD_PRODUCT": {
+      const itemExists = findCartItem(state, action);
+
+      if (itemExists) {
+        return incrementCartItemQuantity(state, action);
+      }
+
+      return [...state, { product: action.payload.product, quantity: 1 }];
+    }
+
+    case "INCREASE_QUANTITY": {
+      const itemExists = findCartItem(state, action);
+
+      if (itemExists) {
+        return incrementCartItemQuantity(state, action);
+      }
+
+      return state;
+    }
+
+    case "REMOVE_PRODUCT": {
+      const itemExists = findCartItem(state, action);
+
+      if (itemExists) {
+        return removeCartItem(state, action);
+      }
+
+      return state;
+    }
+
+    case "CLEAR_CART":
+      return [];
+
+    default:
+      return state;
+  }
+}
+
 export default function CartSidebar() {
+  const [state, dispatch] = useReducer(reducer, []);
+
   return (
     <aside className="w-full lg:w-80 xl:w-96 lg:shrink-0">
       <Card className="gap-0 border-border/60 bg-card">
