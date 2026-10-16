@@ -21,6 +21,10 @@ export type CartAction =
       payload: { product: Product };
     }
   | {
+      type: "DECREASE_QUANTITY";
+      payload: { product: Product };
+    }
+  | {
       type: "CLEAR_CART";
     };
 
