@@ -9,34 +9,35 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import type { Recipe } from "@/types/recipe";
 
-export default function RecipeCard() {
+export default function RecipeCard({recipe}: {recipe: Recipe}) {
   return (
     <Card className="overflow-hidden">
       <img
-        src="https://cdn.dummyjson.com/recipe-images/1.webp"
+        src={recipe.image}
         alt="Classic Margherita Pizza"
         className="aspect-4/3 w-full object-cover"
       />
 
       <CardHeader>
         <div className="flex items-center justify-between">
-          <Badge variant="secondary">Italian</Badge>
+          <Badge variant="secondary">{recipe.cuisine}</Badge>
           <span className="flex items-center gap-1 font-mono text-sm">
             <Star className="size-4 fill-current" />
-            4.6
+            {recipe.rating}
           </span>
         </div>
 
         <CardTitle className="font-serif text-xl">
-          Classic Margherita Pizza
+          {recipe.name}
         </CardTitle>
       </CardHeader>
 
       <CardContent>
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
           <Clock className="size-4" />
-          25 minutes
+          {recipe.cookTimeMinutes} minutes
         </p>
       </CardContent>
 

@@ -1,6 +1,7 @@
+import type { RecipeCollection } from "@/types/recipe";
 import RecipeCard from "./RecipeCard";
 
-export default function RecipeGrid() {
+export default function RecipeGrid({ filteredRecipes }: { filteredRecipes: RecipeCollection }) {
   return (
     <section className="space-y-6 py-8">
       <div>
@@ -11,9 +12,9 @@ export default function RecipeGrid() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <RecipeCard />
-        <RecipeCard />
-        <RecipeCard />
+        {filteredRecipes.map((recipe) => (
+          <RecipeCard recipe={recipe} />
+        ))}
       </div>
     </section>
   );
