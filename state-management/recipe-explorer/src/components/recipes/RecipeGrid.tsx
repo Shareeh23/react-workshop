@@ -1,11 +1,12 @@
 import { ChefHat, LoaderCircle, RefreshCw } from "lucide-react";
 
 import type { Recipe, RecipeCollection } from "@/types/recipe";
+
 import { Button } from "@/components/ui/button";
 import RecipeCard from "./RecipeCard";
 
 type RecipeGridProps = {
-  filteredRecipes: RecipeCollection;
+  displayedRecipes: RecipeCollection;
   isLoading: boolean;
   error: string;
   onRetry: () => void;
@@ -13,7 +14,7 @@ type RecipeGridProps = {
 };
 
 export default function RecipeGrid({
-  filteredRecipes,
+  displayedRecipes,
   isLoading,
   error,
   onRetry,
@@ -72,7 +73,7 @@ export default function RecipeGrid({
     );
   }
 
-  if (filteredRecipes.length === 0) {
+  if (displayedRecipes.length === 0) {
     return (
       <section className="space-y-6 py-8">
         <h2 className="font-serif text-3xl font-bold">Discover Recipes</h2>
@@ -81,7 +82,7 @@ export default function RecipeGrid({
           <ChefHat className="size-10 text-muted-foreground" />
           <h3 className="text-lg font-semibold">No recipes found</h3>
           <p className="text-sm text-muted-foreground">
-            Try selecting a different cuisine.
+            Try a different search term or cuisine.
           </p>
         </div>
       </section>
@@ -98,7 +99,7 @@ export default function RecipeGrid({
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredRecipes.map((recipe) => (
+        {displayedRecipes.map((recipe: Recipe) => (
           <RecipeCard
             key={recipe.id}
             recipe={recipe}

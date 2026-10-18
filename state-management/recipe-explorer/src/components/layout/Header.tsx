@@ -17,7 +17,15 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-export default function Header({ recipes }: { recipes: RecipeCollection }) {
+export default function Header({
+  recipes,
+  query,
+  setQuery,
+}: {
+  recipes: RecipeCollection;
+  query: string;
+  setQuery: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}) {
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
 
   const favorites = useSelector((state: RootState) => state.favorites);
@@ -40,6 +48,8 @@ export default function Header({ recipes }: { recipes: RecipeCollection }) {
           type="search"
           placeholder="Search recipes..."
           className="max-w-sm"
+          value={query}
+          onChange={setQuery}
         />
 
         <Button variant="outline" onClick={() => setIsFavoritesOpen(true)}>

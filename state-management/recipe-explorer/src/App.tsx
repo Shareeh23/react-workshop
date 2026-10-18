@@ -14,6 +14,7 @@ const URL = "https://dummyjson.com/recipes?limit=15";
 export default function App() {
   const [recipes, setRecipes] = useState<RecipeCollection>([]);
   const [selectedCuisine, setSelectedCuisine] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [isRecipeDetailsOpen, setIsRecipeDetailsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,9 +67,23 @@ export default function App() {
     setIsRecipeDetailsOpen(true);
   }
 
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setSearchQuery(e.target.value);
+  }
+
+  const displayedRecipes = searchQuery.trim()
+    ? filteredRecipes.filter((recipe) =>
+        recipe.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+    : filteredRecipes;
+
   return (
     <main className="mx-auto min-h-screen max-w-7xl px-6">
-      <Header recipes={recipes} />
+      <Header
+        recipes={recipes}
+        query={searchQuery}
+        setQuery={handleInputChange}
+      />
 
       <div className="flex items-center justify-between gap-4 pt-8">
         <p className="text-sm text-muted-foreground">
@@ -82,7 +97,7 @@ export default function App() {
       </div>
 
       <RecipeGrid
-        filteredRecipes={filteredRecipes}
+        displayedRecipes={displayedRecipes}
         isLoading={isLoading}
         error={error}
         onRetry={onRetry}
