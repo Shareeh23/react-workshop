@@ -1,3 +1,5 @@
+import type { Recipe } from "@/types/recipe";
+
 import { Heart, Clock, Star } from "lucide-react";
 
 import {
@@ -9,14 +11,19 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { Recipe } from "@/types/recipe";
 
-export default function RecipeCard({recipe}: {recipe: Recipe}) {
+export default function RecipeCard({
+  recipe,
+  handleViewRecipe,
+}: {
+  recipe: Recipe;
+  handleViewRecipe: (recipe: Recipe) => void;
+}) {
   return (
     <Card className="overflow-hidden">
       <img
         src={recipe.image}
-        alt="Classic Margherita Pizza"
+        alt={recipe.name}
         className="aspect-4/3 w-full object-cover"
       />
 
@@ -29,9 +36,7 @@ export default function RecipeCard({recipe}: {recipe: Recipe}) {
           </span>
         </div>
 
-        <CardTitle className="font-serif text-xl">
-          {recipe.name}
-        </CardTitle>
+        <CardTitle className="font-serif text-xl">{recipe.name}</CardTitle>
       </CardHeader>
 
       <CardContent>
@@ -42,7 +47,9 @@ export default function RecipeCard({recipe}: {recipe: Recipe}) {
       </CardContent>
 
       <CardFooter className="justify-between">
-        <Button variant="outline">View Recipe</Button>
+        <Button variant="outline" onClick={() => handleViewRecipe(recipe)}>
+          View Recipe
+        </Button>
 
         <Button variant="ghost" size="icon" aria-label="Add to favorites">
           <Heart className="size-5" />
