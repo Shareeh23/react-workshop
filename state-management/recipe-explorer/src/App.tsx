@@ -68,7 +68,7 @@ export default function App() {
 
   return (
     <main className="mx-auto min-h-screen max-w-7xl px-6">
-      <Header />
+      <Header recipes={recipes} />
 
       <div className="flex items-center justify-between gap-4 pt-8">
         <p className="text-sm text-muted-foreground">

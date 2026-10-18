@@ -1,3 +1,6 @@
+import { useDispatch, useSelector } from "react-redux";
+
+import type { RootState } from "@/store/store";
 import type { Recipe } from "@/types/recipe";
 
 import { Heart, Clock, Star } from "lucide-react";
@@ -11,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { addFavorite, removeFavorite } from "@/store/favoriteSlice";
 
 export default function RecipeCard({
   recipe,
@@ -19,6 +23,20 @@ export default function RecipeCard({
   recipe: Recipe;
   handleViewRecipe: (recipe: Recipe) => void;
 }) {
+  const favorites = useSelector((state: RootState) => state.favorites);
+
+  const dispatch = useDispatch();
+
+  const isFavorite = favorites.includes(recipe.id);
+
+  function handleToggle() {
+    if (isFavorite) {
+      dispatch(removeFavorite(recipe.id));
+    } else {
+      dispatch(addFavorite(recipe.id));
+    }
+  }
+
   return (
     <Card className="overflow-hidden">
       <img
@@ -51,8 +69,15 @@ export default function RecipeCard({
           View Recipe
         </Button>
 
-        <Button variant="ghost" size="icon" aria-label="Add to favorites">
-          <Heart className="size-5" />
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+          onClick={handleToggle}
+        >
+          <Heart
+            className={`size-5 ${isFavorite ? "fill-current text-red-500" : ""}`}
+          />
         </Button>
       </CardFooter>
     </Card>
