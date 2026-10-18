@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import type { APIResponse, RecipeCollection } from "./types/recipe";
+import type { Recipe, APIResponse, RecipeCollection } from "./types/recipe";
 
 import { getUniqueCuisines, getFilteredRecipes } from "./utils/recipe-utils";
 
@@ -14,13 +14,21 @@ const URL = "https://dummyjson.com/recipes?limit=15";
 export default function App() {
   const [recipes, setRecipes] = useState<RecipeCollection>([]);
   const [selectedCuisine, setSelectedCuisine] = useState("all");
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [isRecipeDetailsOpen, setIsRecipeDetailsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [retry, setRetry] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
 
     async function fetchRecipes() {
       try {
+        setIsLoading(true);
+
+        setError("");
+
         const response = await fetch(URL, { signal: controller.signal });
 
         if (!response.ok) {
@@ -30,21 +38,33 @@ export default function App() {
         const data: APIResponse = await response.json();
 
         setRecipes(data.recipes);
-        return;
-      } catch (err) {
+      } catch (err: unknown) {
         if (err instanceof Error && err.name === "AbortError") return;
-        console.error(err);
+        setError(
+          err instanceof Error ? err.message : "Unexpected error occurred",
+        );
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
       }
     }
 
     fetchRecipes();
 
     return () => controller.abort();
-  }, []);
+  }, [retry]);
 
   const cuisines = getUniqueCuisines(recipes);
 
   const filteredRecipes = getFilteredRecipes(selectedCuisine, recipes);
+
+  const onRetry = () => setRetry((prev) => !prev);
+
+  function handleViewRecipe(recipe: Recipe) {
+    setSelectedRecipe(recipe);
+    setIsRecipeDetailsOpen(true);
+  }
 
   return (
     <main className="mx-auto min-h-screen max-w-7xl px-6">
@@ -61,11 +81,21 @@ export default function App() {
         />
       </div>
 
-      <RecipeGrid filteredRecipes={filteredRecipes} />
+      <RecipeGrid
+        filteredRecipes={filteredRecipes}
+        isLoading={isLoading}
+        error={error}
+        onRetry={onRetry}
+        handleViewRecipe={handleViewRecipe}
+      />
 
       <RecipeDetails
         open={isRecipeDetailsOpen}
-        onOpenChange={setIsRecipeDetailsOpen}
+        onOpenChange={(open) => {
+          setIsRecipeDetailsOpen(open);
+          if (!open) setSelectedRecipe(null);
+        }}
+        recipe={selectedRecipe}
       />
     </main>
   );
