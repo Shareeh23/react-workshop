@@ -1,13 +1,19 @@
 import { useGetPostsQuery } from "@/services/api-slice";
-
 import ErrorState from "@/components/feedback/ErrorState";
 import Spinner from "@/components/feedback/Spinner";
 import PostCard from "./PostCard";
 
 export default function FeedGrid() {
-  const { isError, isFetching, error, data, refetch } = useGetPostsQuery();
+  const {
+    isLoading,
+    isError,
+    isFetching,
+    error,
+    data,
+    refetch,
+  } = useGetPostsQuery();
 
-  if (isFetching && !data) {
+  if (isLoading) {
     return <Spinner />;
   }
 
@@ -41,6 +47,16 @@ export default function FeedGrid() {
           Ideas, stories, and conversations shared by the community.
         </p>
       </div>
+
+      {isFetching && (
+        <p
+          role="status"
+          className="mb-4 flex items-center gap-2 text-sm text-muted-foreground"
+        >
+          <span className="size-3 animate-spin rounded-full border-2 border-current border-r-transparent" />
+          Refreshing posts...
+        </p>
+      )}
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         {posts.map((post) => (
