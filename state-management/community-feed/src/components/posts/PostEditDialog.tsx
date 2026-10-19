@@ -12,6 +12,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+import {
+  Field,
+  FieldDescription,
+  FieldLabel,
+} from "@/components/ui/field";
+
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -29,6 +35,7 @@ export default function PostEditDialog({
 }: PostEditDialogProps) {
   const [title, setTitle] = useState(post.title);
   const [body, setBody] = useState(post.body);
+  const [tags, setTags] = useState(post.tags.join(", "));
 
   const [updatePost, { isLoading, isError }] = useUpdatePostMutation();
 
@@ -38,11 +45,17 @@ export default function PostEditDialog({
     try {
       const updatedPost = await updatePost({
         id: post.id,
-        body: { title, body },
+        body: {
+          title,
+          body,
+          tags: tags
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter(Boolean),
+        },
       }).unwrap();
 
       console.log(updatedPost);
-
       onOpenChange(false);
     } catch (err) {
       console.error(err);
@@ -60,24 +73,18 @@ export default function PostEditDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="space-y-2">
-            <label htmlFor="post-title" className="text-sm font-medium">
-              Title
-            </label>
-
+          <Field>
+            <FieldLabel htmlFor="post-title">Title</FieldLabel>
             <Input
               id="post-title"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
               required
             />
-          </div>
+          </Field>
 
-          <div className="space-y-2">
-            <label htmlFor="post-body" className="text-sm font-medium">
-              Content
-            </label>
-
+          <Field>
+            <FieldLabel htmlFor="post-body">Content</FieldLabel>
             <Textarea
               id="post-body"
               value={body}
@@ -85,7 +92,20 @@ export default function PostEditDialog({
               className="min-h-32 resize-y"
               required
             />
-          </div>
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="post-tags">Tags</FieldLabel>
+            <Input
+              id="post-tags"
+              value={tags}
+              onChange={(event) => setTags(event.target.value)}
+              placeholder="technology, programming"
+            />
+            <FieldDescription>
+              Separate tags with commas.
+            </FieldDescription>
+          </Field>
 
           {isError && (
             <p role="alert" className="text-sm text-destructive">
