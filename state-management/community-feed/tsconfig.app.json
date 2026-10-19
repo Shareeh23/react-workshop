@@ -26,5 +26,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "../../posts"]
+  "include": ["src", "src/components/posts"]
 }

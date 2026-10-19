@@ -1,5 +1,9 @@
-export function App() {
-  return <h1 className="p-4 text-3xl">Community Feed</h1>;
-}
+import FeedGrid from "@/components/posts/FeedGrid";
 
-export default App;
+export default function App() {
+  return (
+    <main className="min-h-screen bg-background">
+      <FeedGrid />
+    </main>
+  );
+}
