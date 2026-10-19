@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import {
   Eye,
+  LoaderCircle,
   MessageCircle,
   Pencil,
   ThumbsDown,
@@ -10,8 +11,8 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useDeletePostMutation } from "@/services/api-slice";
 import PostEditDialog from "./PostEditDialog";
-
 import type { Post } from "@/types/post.types";
 
 type PostCardProps = {
@@ -20,6 +21,17 @@ type PostCardProps = {
 
 export default function PostCard({ post }: PostCardProps) {
   const [isEditOpen, setIsEditOpen] = useState(false);
+
+  const [deletePost, { isLoading }] = useDeletePostMutation();
+
+  async function handleDelete() {
+    try {
+      const deletedPost = await deletePost({ id: post.id }).unwrap();
+      console.log(deletedPost);
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   return (
     <article className="group flex flex-col rounded-xl border border-border bg-card p-5 transition-shadow duration-200 hover:shadow-md sm:p-6">
@@ -57,8 +69,14 @@ export default function PostCard({ post }: PostCardProps) {
             size="icon"
             aria-label={`Delete post ${post.id}`}
             title="Delete post"
+            onClick={handleDelete}
+            disabled={isLoading}
           >
-            <Trash2 className="size-4" />
+            {isLoading ? (
+              <LoaderCircle className="size-4 animate-spin" />
+            ) : (
+              <Trash2 className="size-4" />
+            )}
           </Button>
         </div>
       </div>
@@ -116,6 +134,7 @@ export default function PostCard({ post }: PostCardProps) {
         </Button>
       </div>
 
+      {/* Edit Dialog */}
       {isEditOpen && (
         <PostEditDialog
           post={post}
