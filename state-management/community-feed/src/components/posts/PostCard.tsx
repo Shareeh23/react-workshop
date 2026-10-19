@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import {
   Eye,
   MessageCircle,
@@ -7,24 +9,18 @@ import {
   Trash2,
 } from "lucide-react";
 
-type Post = {
-  id: number;
-  title: string;
-  body: string;
-  tags: string[];
-  reactions: {
-    likes: number;
-    dislikes: number;
-  };
-  views: number;
-  userId: number;
-};
+import { Button } from "@/components/ui/button";
+import PostEditDialog from "./PostEditDialog";
+
+import type { Post } from "@/types/post.types";
 
 type PostCardProps = {
   post: Post;
 };
 
 export default function PostCard({ post }: PostCardProps) {
+  const [isEditOpen, setIsEditOpen] = useState(false);
+
   return (
     <article className="group flex flex-col rounded-xl border border-border bg-card p-5 transition-shadow duration-200 hover:shadow-md sm:p-6">
       {/* Post Header */}
@@ -38,30 +34,32 @@ export default function PostCard({ post }: PostCardProps) {
             <p className="text-sm font-semibold text-foreground">
               User {post.userId}
             </p>
-
             <p className="text-xs text-muted-foreground">Post #{post.id}</p>
           </div>
         </div>
 
         {/* CRUD Actions */}
         <div className="flex shrink-0 items-center gap-1">
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             aria-label={`Edit post ${post.id}`}
             title="Edit post"
-            className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            onClick={() => setIsEditOpen(true)}
           >
             <Pencil className="size-4" />
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             aria-label={`Delete post ${post.id}`}
             title="Delete post"
-            className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <Trash2 className="size-4" />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -107,14 +105,24 @@ export default function PostCard({ post }: PostCardProps) {
           </span>
         </div>
 
-        <button
+        <Button
           type="button"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          variant="ghost"
+          size="sm"
+          className="gap-1.5 text-xs text-muted-foreground hover:text-primary"
         >
           <MessageCircle className="size-3.5" />
           Comments
-        </button>
+        </Button>
       </div>
+
+      {isEditOpen && (
+        <PostEditDialog
+          post={post}
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
+        />
+      )}
     </article>
   );
 }
