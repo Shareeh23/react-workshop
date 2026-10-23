@@ -19,8 +19,8 @@ export function SiteHeader() {
             Products
           </Button>
 
-          <Button variant="ghost" nativeButton={false} render={<Link href="/" />}>
-            About
+          <Button variant="ghost" nativeButton={false} render={<Link href="/cart" />}>
+            Cart
           </Button>
         </nav>
       </div>
