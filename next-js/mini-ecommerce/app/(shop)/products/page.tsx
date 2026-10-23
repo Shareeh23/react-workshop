@@ -1,36 +1,59 @@
+import Image from "next/image";
 import Link from "next/link";
+import { ProductsResponse } from "@/types/products";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const products = [
-  { id: "1", name: "Classic T-Shirt", price: 2500 },
-  { id: "2", name: "Everyday Backpack", price: 6500 },
-  { id: "3", name: "Minimalist Watch", price: 8500 },
-];
+export default async function ProductsPage() {
+  const response = await fetch(
+    "https://dummyjson.com/products?limit=16&skip=20&select=id,title,price,thumbnail,rating",
+  );
 
-export default function ProductsPage() {
+  const data: ProductsResponse = await response.json();
+
   return (
-    <div className="container mx-auto space-y-6 px-6 py-12">
+    <main className="container mx-auto space-y-6 px-6 py-12">
       <div className="space-y-2">
         <h1 className="text-3xl font-semibold tracking-tight">Products</h1>
         <p className="text-muted-foreground">
           Explore our collection of products.
         </p>
       </div>
-      <ul className="space-y-4">
-        {products.map((product) => (
-          <li key={product.id} className="border-b pb-4">
-            <Link
-              href={`/products/${product.id}`}
-              className="font-medium hover:underline"
-            >
-              {product.name}
+
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {data.products.map((product) => (
+          <Card key={product.id} className="overflow-hidden">
+            <Link href={`/products/${product.id}`}>
+              <div className="relative aspect-square bg-muted">
+                <Image
+                  src={product.thumbnail}
+                  alt={product.title}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                  className="object-contain p-4"
+                />
+              </div>
             </Link>
 
-            <p className="mt-1 text-sm text-muted-foreground">
-              LKR {product.price.toLocaleString("en-LK")}
-            </p>
-          </li>
+            <CardHeader>
+              <CardTitle className="line-clamp-2 text-base">
+                <Link
+                  href={`/products/${product.id}`}
+                  className="hover:underline"
+                >
+                  {product.title}
+                </Link>
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent className="flex items-center justify-between">
+              <p className="font-semibold">${product.price.toFixed(2)}</p>
+              <p className="text-sm text-muted-foreground">
+                ★ {product.rating}
+              </p>
+            </CardContent>
+          </Card>
         ))}
-      </ul>
-    </div>
+      </div>
+    </main>
   );
 }
