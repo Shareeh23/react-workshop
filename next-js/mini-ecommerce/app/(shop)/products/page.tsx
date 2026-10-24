@@ -8,6 +8,8 @@ export default async function ProductsPage() {
     "https://dummyjson.com/products?limit=16&skip=20&select=id,title,price,thumbnail,rating",
   );
 
+  if(!response.ok) throw new Error("Failed to fetch products.")
+
   const data: ProductsResponse = await response.json();
 
   return (
