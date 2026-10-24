@@ -5,10 +5,17 @@ node_modules/
 dist/
 build/
 
+# Next.js build output
+/.next/
+/out/
+
 # Environment variables
 .env
 .env.*
 !.env.example
+
+# TypeScript
+*.tsbuildinfo
 
 # Logs
 logs/
