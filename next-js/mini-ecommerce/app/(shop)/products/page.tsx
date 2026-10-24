@@ -6,9 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default async function ProductsPage() {
   const response = await fetch(
     "https://dummyjson.com/products?limit=16&skip=20&select=id,title,price,thumbnail,rating",
+    {
+      cache: "force-cache",
+      next: { tags: ["products"], revalidate: 60 },
+    },
   );
 
-  if(!response.ok) throw new Error("Failed to fetch products.")
+  if (!response.ok) throw new Error("Failed to fetch products.");
 
   const data: ProductsResponse = await response.json();
 
