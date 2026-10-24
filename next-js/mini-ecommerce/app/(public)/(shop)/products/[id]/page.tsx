@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
 import {
   ArrowLeft,
   Check,
@@ -11,10 +12,12 @@ import {
 } from "lucide-react";
 
 import { ProductDetails } from "@/types/products";
-import { Badge } from "@/components/ui/badge";
+
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { AddToCartButton } from "@/components/feature/add-to-cart-btn";
 
 type ProductPageProps = {
   params: Promise<{ id: string }>;
@@ -134,13 +137,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
             )}
           </div>
 
-          <Button
-            className="mt-6 w-full sm:w-fit"
+          <AddToCartButton
+            productId={product.id}
             size="lg"
             disabled={!isInStock}
-          >
-            Add to Cart
-          </Button>
+            className="mt-6 w-full sm:w-fit"
+          />
 
           <Separator className="my-8" />
 

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ProductsResponse } from "@/types/products";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AddToCartButton } from "@/components/feature/add-to-cart-btn";
 
 export default async function ProductsPage() {
   const response = await fetch(
@@ -51,11 +52,15 @@ export default async function ProductsPage() {
               </CardTitle>
             </CardHeader>
 
-            <CardContent className="flex items-center justify-between">
-              <p className="font-semibold">${product.price.toFixed(2)}</p>
-              <p className="text-sm text-muted-foreground">
-                ★ {product.rating}
-              </p>
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="font-semibold">${product.price.toFixed(2)}</p>
+                <p className="text-sm text-muted-foreground">
+                  ★ {product.rating}
+                </p>
+              </div>
+
+              <AddToCartButton productId={product.id} className="w-full" />
             </CardContent>
           </Card>
         ))}
