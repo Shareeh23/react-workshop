@@ -28,3 +28,8 @@ Thumbs.db
 
 # Local configuration
 *.local
+
+# Local SQLite database 
+sqlite.db 
+sqlite.db-shm 
+sqlite.db-wal
